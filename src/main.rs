@@ -1,13 +1,16 @@
 use bevy::{pbr::wireframe::WireframePlugin, prelude::*};
+use simulation::SimulationPlugin;
 
 mod cell;
 mod camera;
+mod simulation;
 
 fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
             WireframePlugin,
+            SimulationPlugin
         ))
         .add_systems(Startup, (
             camera::spawn_camera,
