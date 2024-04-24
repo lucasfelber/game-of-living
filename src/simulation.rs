@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::cell_calc::{calculate_board, CellState};
+
 pub struct SimulationPlugin;
 
 impl Plugin for SimulationPlugin {
@@ -39,7 +41,7 @@ struct SimulationTimer(Timer);
 
 impl Default for SimulationTimer {
     fn default() -> Self {
-        Self(Timer::from_seconds(2., TimerMode::Repeating))
+        Self(Timer::from_seconds(5., TimerMode::Repeating))
     }
 }
 
@@ -59,13 +61,15 @@ fn simulation_step(
     time: Res<Time>,
     mut timer: ResMut<SimulationTimer>,
     state: Res<State<SimulationState>>,
+    board: Res<State<CellState>>,
+    next_board: ResMut<NextState<CellState>>,
 ) {
     match state.get() {
         SimulationState::Running => {
             if timer.0.tick(time.delta()).finished() {
-                println!("STEP! at {:?}", timer.0.duration())
+                calculate_board(board, next_board)
             }
         },
-        SimulationState::Editing => println!("paused")
+        SimulationState::Editing => {}
     }
 }

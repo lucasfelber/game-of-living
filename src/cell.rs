@@ -1,6 +1,7 @@
 use bevy::{pbr::wireframe::{NoWireframe, Wireframe}, prelude::*};
 
-const GRID: u32 = 4;
+use crate::GRID;
+
 const CELL_SIZE: f32 = 1.;
 
 #[derive(Component)]
@@ -25,7 +26,7 @@ pub fn spawn_cells(
             commands.spawn((
                 Cell,
                 State(0),
-                Position{x, y},
+                // Position{x, y},
                 SwapMaterial(materials.add(Color::rgba(0., 0., 0., 0.))),
                 PbrBundle {
                     mesh: meshes.add(Cuboid::new(CELL_SIZE, CELL_SIZE/2., CELL_SIZE)),
