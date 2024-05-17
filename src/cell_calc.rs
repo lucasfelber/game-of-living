@@ -6,21 +6,26 @@ pub struct CellCalcPlugin;
 
 impl Plugin for CellCalcPlugin {
     fn build(&self, app: &mut App) {
-        app.init_state::<CellState>();
+        app.init_state::<Board>();
     }
 }
 
-#[derive(States, Default, Debug, Hash, Eq, PartialEq, Clone)]
-pub struct CellState([i8; GRID*GRID]);
+#[derive(States, Debug, Hash, Eq, PartialEq, Clone)]
+pub struct Board(pub [i8; GRID*GRID]);
+
+impl Default for Board {
+    fn default() -> Self {
+        Self([0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0])
+    }
+}
 
 pub fn calculate_board(
-    board: Res<State<CellState>>,
-    mut next_board: ResMut<NextState<CellState>>,
-) {
+    board: [i8; GRID*GRID],
+) -> [i8; GRID*GRID] {
     let mut new_board = [0; GRID*GRID];
 
-    for (i, state) in board.get().0.iter().enumerate() {
-        let neighbours = calculate_neigbours(i, &board.get().0);
+    for (i, state) in board.iter().enumerate() {
+        let neighbours = calculate_neigbours(i, &board);
 
         if *state == 0 && neighbours == 3 {
             new_board[i] = 1;
@@ -30,18 +35,17 @@ pub fn calculate_board(
             new_board[i] = *state;
         }
     }
-    println!("{:?}", new_board);
 
-    next_board.set(CellState(new_board))
+    new_board
 }
 
 fn calculate_neigbours(i: usize, board: &[i8]) -> i8 {
-    board[(i + GRID*GRID - 1) % GRID*GRID] +
-    board[(i + GRID*GRID + 1) % GRID*GRID] +
-    board[(i + GRID*GRID - 4) % GRID*GRID] +
-    board[(i + GRID*GRID + 4) % GRID*GRID] +
-    board[(i + GRID*GRID - 5) % GRID*GRID] +
-    board[(i + GRID*GRID - 3) % GRID*GRID] +
-    board[(i + GRID*GRID + 3) % GRID*GRID] +
-    board[(i + GRID*GRID + 5) % GRID*GRID]
+    board[(i + board.len() - 1) % board.len()] +
+    board[(i + board.len() + 1) % board.len()] +
+    board[(i + board.len() - GRID) % board.len()] +
+    board[(i + board.len() + GRID) % board.len()] +
+    board[(i + board.len() - GRID+1) % board.len()] +
+    board[(i + board.len() - GRID-1) % board.len()] +
+    board[(i + board.len() + GRID-1) % board.len()] +
+    board[(i + board.len() + GRID+1) % board.len()]
 }
